@@ -7,6 +7,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { ConfigService } from '@nestjs/config';
 import { User } from './entities/user.entity';
+import { UpdateCustomerDto } from './dto/update-customer.dto';
 
 @Injectable()
 export class CustomerService {
@@ -35,15 +36,32 @@ export class CustomerService {
       //   throw new BadRequestException(`A customer with identification ${identification} already exists.`);
       // }
 
-      const response = await this.customerModel.create(createCustomerDto);
-      console.log('response: ', response);
-      
-    return response;    
+      return await this.customerModel.create(createCustomerDto);   
     } catch (error) {  
       console.log(error);    
       this.handleExceptions(error);
     }
+  }
 
+  async update(id: string, updateCustomerDto: UpdateCustomerDto) {
+    try {  
+      const customerBD: Customer = await this.customerModel.findById(id);
+      console.log('customerBD', customerBD);
+
+      const updateCustomer = {
+        customerBD,
+        ...updateCustomerDto
+      }
+
+      const customer = await this.customerModel.findByIdAndUpdate( id, updateCustomer, {new: true});
+      console.log('customer', customer);
+
+      return customer; 
+
+    } catch (error) {  
+      console.log(error);    
+      this.handleExceptions(error);
+    }
   }
  
 
