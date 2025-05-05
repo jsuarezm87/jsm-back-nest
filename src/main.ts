@@ -17,9 +17,9 @@ async function bootstrap() {
   );
 
   app.enableCors({
-    origin: 'http://localhost:3000', // Reemplaza con la URL de tu frontend
+    origin: 'http://localhost:3000', 
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true, // Si necesitas enviar cookies o encabezados de autenticación
+    credentials: true,
   });
 
   await app.listen(process.env.PORT);
