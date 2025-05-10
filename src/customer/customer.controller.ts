@@ -1,4 +1,4 @@
-import { Controller, Post, Body,  HttpCode, HttpStatus, Put, Param } from '@nestjs/common';
+import { Controller, Post, Body,  HttpCode, HttpStatus, Put, Param, Get } from '@nestjs/common';
 import { CustomerService } from './customer.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
@@ -12,7 +12,6 @@ export class CustomerController {
   @Post('create')
   @HttpCode( HttpStatus.OK )
   create(@Body() createCustomerDto: CreateCustomerDto) {
-    console.log('createCustomerDto', createCustomerDto);
     return this.customerService.create(createCustomerDto);
   }
 
@@ -20,5 +19,18 @@ export class CustomerController {
   update(@Param('id', ParseMongoIdPipe) id: string, @Body() updateCustomerDto: UpdateCustomerDto) {
     return this.customerService.update(id, updateCustomerDto);
   }
+
+  @Get('list')
+  listCustomers() {
+    return this.customerService.list();
+  }
+
+  @Put('delete/:id')
+  delete(@Param('id', ParseMongoIdPipe) id: string) {
+    return this.customerService.delete(id);
+  }
+
+
+
 
 }

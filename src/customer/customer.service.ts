@@ -8,6 +8,7 @@ import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { ConfigService } from '@nestjs/config';
 import { User } from './entities/user.entity';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
+import { ManagedByPopulated } from './interfaces/managedByPopulated.interface';
 
 @Injectable()
 export class CustomerService {
@@ -28,7 +29,7 @@ export class CustomerService {
 
   async create(createCustomerDto: CreateCustomerDto) {
     try {
-      const userDB = await this.userModel.findOne({ email: createCustomerDto.managedBy });
+      const userDB: User | null = await this.userModel.findOne({ email: createCustomerDto.managedBy });
       createCustomerDto.managedBy = userDB._id as string;
     
       // const existingCustomerByIdentification = await this.customerModel.findOne({ identification });
@@ -60,8 +61,59 @@ export class CustomerService {
     }
   }
  
+  async list() {
+    try {
+      // Busca todos los clientes y popula el campo 'managedBy' con el email, excluyendo el _id
+      const customers = await this.customerModel
+                                .find()
+                                .populate<{ managedBy: ManagedByPopulated }>('managedBy', 'email -_id');
+  
+      // Transforma los datos eliminando __v y ajustando el formato de managedBy
+      const transformedCustomers = customers.map(customer => {
+        const customerObj = customer.toObject();
+        const { managedBy, ...data } = customerObj;
+
+        return {
+          ...data,
+          managedBy: managedBy.email
+        };
+      });
+  
+      // Devuelve la respuesta con los datos transformados
+      return transformedCustomers;
+      
+    } catch (err) {
+      console.error(err);
+      // Devuelve un error en caso de fallo
+      throw new InternalServerErrorException({
+        statusCode: 500,
+        message: 'Error al listar los clientes',
+      });
+    }
+  }
 
 
+  async delete(id: string) {
+    try {
+     const {deletedCount} = await this.customerModel.deleteOne({ _id: id });
+      if (deletedCount === 0) {
+        throw new BadRequestException(`Customer with id ${id} not found`);
+      }
+      return {
+        statusCode: 200,
+        message: `Customer with id ${id} deleted successfully`,
+      };
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error; // Re-throw the BadRequestException
+      }
+      console.error(error);
+      throw new InternalServerErrorException({
+        statusCode: 500,
+        message: 'Error deleting customer',
+      });
+    }
+  }
 
 
   private handleExceptions(error: any) {
