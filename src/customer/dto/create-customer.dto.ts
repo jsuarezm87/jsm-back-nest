@@ -1,40 +1,38 @@
-import { IsString, IsOptional, IsEmail, IsInt, IsPositive, IsMongoId, MinLength, Matches, IsIn } from 'class-validator';
+import { IsString, IsEmail, IsInt, IsPositive, Matches, MinLength, IsIn } from 'class-validator';
 
 export class CreateCustomerDto {
-  @IsString()
-  @MinLength(1)
+  @IsString({ message: 'El nombre es obligatorio' })
+  @MinLength(1, { message: 'El nombre es obligatorio' })
   name: string;
 
-  @IsString()
-  @MinLength(1)
+  @IsString({ message: 'El apellido es obligatorio' })
+  @MinLength(1, { message: 'El apellido es obligatorio' })
   lastName?: string;
 
-  @IsInt()
-  @IsPositive()
+  @IsInt({ message: 'Debe ser un número entero' })
+  @IsPositive({ message: 'Debe tener mínimo 8 dígitos' })
   identification: number;
 
-  @IsOptional()
-  @IsString()
-  address?: string;
+  @IsString({ message: 'La dirección es obligatoria' })
+  @MinLength(1, { message: 'La dirección es obligatoria' })
+  address: string; // Eliminado @IsOptional()
 
-  @IsOptional()
-  @IsString()
-  @Matches(/^\d{3}-\d{7}$/, { message: 'Phone must match the format XXX-XXXXXXX' })
+  @IsString({ message: 'El formato debe ser ###-#######' })
+  @Matches(/^\d{3}-\d{7}$/, { message: 'El formato debe ser ###-#######' })
   phone?: string;
 
-  @IsOptional()
-  @IsString()
-  @Matches(/^\d{3}-\d{7}$/, { message: 'Phone must match the format XXX-XXXXXXX' })
+  @IsString({ message: 'El formato debe ser ###-#######' })
+  @Matches(/^\d{3}-\d{7}$/, { message: 'El formato debe ser ###-#######' })
   phone2?: string;
 
-  @IsEmail()
+  @IsEmail({}, { message: 'El email es obligatorio' })
   email: string;
 
-  @IsString()
-  @MinLength(1)
-  @IsIn(['ACTIVO', 'INACTIVO'], { message: "Status must be either 'ACTIVO' or 'INACTIVO'" })
+  @IsString({ message: 'El estado es obligatorio' })
+  @MinLength(1, { message: 'El estado es obligatorio' })
+  @IsIn(['ACTIVO', 'INACTIVO'], { message: "El estado debe ser 'ACTIVO' o 'INACTIVO'" })
   status: string;
 
-  @IsString()
+  @IsString({ message: 'El usuario responsable es obligatorio' })
   managedBy: string;
 }

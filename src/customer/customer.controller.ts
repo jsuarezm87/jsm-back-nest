@@ -12,6 +12,7 @@ export class CustomerController {
   @Post('create')
   @HttpCode( HttpStatus.OK )
   create(@Body() createCustomerDto: CreateCustomerDto) {
+    console.log('createCustomerDto', createCustomerDto);
     return this.customerService.create(createCustomerDto);
   }
 
