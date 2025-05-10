@@ -29,18 +29,23 @@ export class CustomerService {
 
   async create(createCustomerDto: CreateCustomerDto) {
     try {
-      const userDB: User | null = await this.userModel.findOne({ email: createCustomerDto.managedBy });
-      createCustomerDto.managedBy = userDB._id as string;
-    
-      // const existingCustomerByIdentification = await this.customerModel.findOne({ identification });
-      // if (existingCustomerByIdentification) {
-      //   throw new BadRequestException(`A customer with identification ${identification} already exists.`);
-      // }
+      const { identification, managedBy, email } = createCustomerDto;
+  
+      const existingCustomerByIdentification = await this.customerModel.findOne({ identification });
+      if (existingCustomerByIdentification) throw new BadRequestException(`A customer with identification ${identification} already exists.`);
+      
+      const existingCustomerByEmail = await this.customerModel.findOne({ email });
+      if (existingCustomerByEmail) throw new BadRequestException(`A customer with email ${email} already exists.`);
+  
+      const userDB: User | null = await this.userModel.findOne({ email: managedBy });
+      if (!userDB) throw new BadRequestException(`No user found with email ${managedBy}`);
+      
 
-      return await this.customerModel.create(createCustomerDto);   
-    } catch (error) {  
-      console.log(error);    
-      this.handleExceptions(error);
+      createCustomerDto.managedBy = userDB._id as string;
+  
+      return await this.customerModel.create(createCustomerDto);
+    } catch (error) {
+      this.handleError(error, 'Error creating customer');     
     }
   }
 
@@ -56,8 +61,7 @@ export class CustomerService {
       return await this.customerModel.findByIdAndUpdate( id, updateCustomer, {new: true});
       
     } catch (error) {  
-      console.log(error);    
-      this.handleExceptions(error);
+      this.handleError(error, 'Error updating customer');  
     }
   }
  
@@ -82,13 +86,8 @@ export class CustomerService {
       // Devuelve la respuesta con los datos transformados
       return transformedCustomers;
       
-    } catch (err) {
-      console.error(err);
-      // Devuelve un error en caso de fallo
-      throw new InternalServerErrorException({
-        statusCode: 500,
-        message: 'Error al listar los clientes',
-      });
+    } catch (error) {
+      this.handleError(error, 'Error getting customer');  
     }
   }
 
@@ -96,31 +95,26 @@ export class CustomerService {
   async delete(id: string) {
     try {
      const {deletedCount} = await this.customerModel.deleteOne({ _id: id });
-      if (deletedCount === 0) {
-        throw new BadRequestException(`Customer with id ${id} not found`);
-      }
+      if (deletedCount === 0) throw new BadRequestException(`Customer with id ${id} not found`);
+      
       return {
         statusCode: 200,
         message: `Customer with id ${id} deleted successfully`,
       };
     } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw error; // Re-throw the BadRequestException
-      }
-      console.error(error);
-      throw new InternalServerErrorException({
-        statusCode: 500,
-        message: 'Error deleting customer',
-      });
+      this.handleError(error, 'Error delinting customer'); 
     }
   }
 
 
-  private handleExceptions(error: any) {
-    if (error.code === 11000) {
-      throw new BadRequestException(`Customer exists is db ${JSON.stringify(error.keyValue)}`)
-    } 
-    console.log(error);
-    throw new InternalServerErrorException(`Can't create/update Customer, check server logs`);  
+  private handleError(error: any, msg: string) {
+    console.log(`handleError: ${msg}: ${error?.message}`);
+    if (error instanceof BadRequestException)  throw error;
+    
+    throw new InternalServerErrorException({
+      statusCode: 500,
+      message: `${msg}: ${error?.message}`,
+    });
   }
+
 }
