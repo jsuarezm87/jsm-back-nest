@@ -46,18 +46,14 @@ export class CustomerService {
   async update(id: string, updateCustomerDto: UpdateCustomerDto) {
     try {  
       const customerBD: Customer = await this.customerModel.findById(id);
-      console.log('customerBD', customerBD);
 
       const updateCustomer = {
         customerBD,
         ...updateCustomerDto
       }
 
-      const customer = await this.customerModel.findByIdAndUpdate( id, updateCustomer, {new: true});
-      console.log('customer', customer);
-
-      return customer; 
-
+      return await this.customerModel.findByIdAndUpdate( id, updateCustomer, {new: true});
+      
     } catch (error) {  
       console.log(error);    
       this.handleExceptions(error);

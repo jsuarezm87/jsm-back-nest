@@ -16,10 +16,7 @@ export class CustomerController {
   }
 
   @Put('update/:id')
-  update( @Param('id', ParseMongoIdPipe) id: string,
-          @Body() updateCustomerDto: UpdateCustomerDto,) {
-    console.log('updateCustomerDto', updateCustomerDto);
-    console.log('id', id);
+  update(@Param('id', ParseMongoIdPipe) id: string, @Body() updateCustomerDto: UpdateCustomerDto) {
     return this.customerService.update(id, updateCustomerDto);
   }
 
