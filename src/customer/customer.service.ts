@@ -109,8 +109,15 @@ export class CustomerService {
 
   private handleError(error: any, msg: string) {
     console.log(`handleError: ${msg}: ${error?.message}`);
-    if (error instanceof BadRequestException)  throw error;
-    
+    if (error instanceof BadRequestException)  {
+      throw new BadRequestException({
+        statusCode: 400,
+        message: {
+          error: `${error?.message}`
+        }
+      });
+    }
+     
     throw new InternalServerErrorException({
       statusCode: 500,
       message: `${msg}: ${error?.message}`,
