@@ -67,23 +67,24 @@ export class CustomerService {
  
   async list() {
     try {
-      // Busca todos los clientes y popula el campo 'managedBy' con el email, excluyendo el _id
       const customers = await this.customerModel
                                 .find()
                                 .populate<{ managedBy: ManagedByPopulated }>('managedBy', 'email -_id');
-  
-      // Transforma los datos eliminando __v y ajustando el formato de managedBy
+
       const transformedCustomers = customers.map(customer => {
         const customerObj = customer.toObject();
         const { managedBy, ...data } = customerObj;
 
+        const managedByValue = typeof managedBy === 'string'
+          ? managedBy
+          : managedBy?.email || '';
+
         return {
           ...data,
-          managedBy: managedBy.email
+          managedBy: managedByValue
         };
       });
-  
-      // Devuelve la respuesta con los datos transformados
+
       return transformedCustomers;
       
     } catch (error) {
