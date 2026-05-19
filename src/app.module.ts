@@ -17,7 +17,7 @@ import { CustomerModule } from './customer/customer.module';
     ServeStaticModule.forRoot({ 
       rootPath: join(__dirname,'..','public') 
     }),
-    MongooseModule.forRoot(process.env.MONGODB, {
+    MongooseModule.forRoot(process.env.MONGODB || '', {
       dbName: 'plantilla'
     }),
     CommonModule,
