@@ -21,10 +21,10 @@ export class Customer extends Document {
   @Prop()
   phone2?: string;
 
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true, unique: true, lowercase: true, trim: true })
   email: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, enum: ['ACTIVO', 'INACTIVO'] })
   status: string;
 
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })

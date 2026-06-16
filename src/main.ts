@@ -8,7 +8,8 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const corsOrigins = (configService.get<string>('corsOrigins') || '')
     .split(',')
-    .map(origin => origin.trim());
+    .map(origin => origin.trim())
+    .filter(Boolean);
 
   app.setGlobalPrefix('api');
 
@@ -18,7 +19,7 @@ async function bootstrap() {
     origin: corsOrigins,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization', 'login-token'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
   const port = configService.get<number>('port');

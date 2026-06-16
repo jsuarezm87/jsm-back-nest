@@ -1,6 +1,7 @@
 export const  EnvConfiguration = () => ({
     environment: process.env.NODE_ENV || 'dev' ,     
     mongodb: process.env.MONGODB,   
+    mongodbDbName: process.env.MONGODB_DB_NAME || 'plantilla',
     port: +(process.env.PORT || 3005),
     defaultLimit: +(process.env.DEFAULT_LIMIT || 10),
     secretJwt: process.env.SECRET_JWT,

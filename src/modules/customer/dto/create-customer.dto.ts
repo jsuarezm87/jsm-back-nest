@@ -34,7 +34,4 @@ export class CreateCustomerDto {
   @MinLength(1, { message: 'El estado es obligatorio' })
   @IsIn(['ACTIVO', 'INACTIVO'], { message: "El estado debe ser 'ACTIVO' o 'INACTIVO'" })
   status: string;
-
-  @IsString({ message: 'El usuario responsable es obligatorio' })
-  managedBy: string;
 }

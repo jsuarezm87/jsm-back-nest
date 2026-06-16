@@ -4,18 +4,18 @@ import { CustomerService } from './customer.service';
 import { CustomerController } from './customer.controller';
 import { Customer, CustomerSchema } from './entities/customer.entity';
 import { ConfigModule } from '@nestjs/config';
-import { User, UserSchema } from './entities/user.entity';
-import { JwtModule } from '@nestjs/jwt';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { AuthModule } from '../auth/auth.module';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   controllers: [CustomerController],
   imports: [
     ConfigModule,
-    JwtModule.register({}),
+    AuthModule,
+    UsersModule,
     MongooseModule.forFeature([
-      { name: Customer.name, schema: CustomerSchema },
-      { name: User.name, schema: UserSchema }
+      { name: Customer.name, schema: CustomerSchema }
     ])
   ],
   providers: [CustomerService, JwtAuthGuard],
